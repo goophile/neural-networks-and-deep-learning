@@ -45,14 +45,6 @@ class Network(object):
             a = sigmoid(np.dot(w, a) + b)
         return a
 
-    def evaluate(self, test_data):
-        """Return the number of test inputs for which the neural
-        network outputs the correct result. Note that the neural
-        network's output is assumed to be the index of whichever
-        neuron in the final layer has the highest activation."""
-        test_results = [(np.argmax(self.feedforward(x)), y) for (x, y) in test_data]
-        return sum(int(x == y) for (x, y) in test_results)
-
     def SGD(self, training_data, epochs, mini_batch_size, eta, test_data=None):
         """Train the neural network using mini-batch stochastic
         gradient descent.  The ``training_data`` is a list of tuples
@@ -62,6 +54,8 @@ class Network(object):
         network will be evaluated against the test data after each
         epoch, and partial progress printed out.  This is useful for
         tracking progress, but slows things down substantially."""
+
+        training_data = list(training_data)
 
         for j in range(epochs):
             self.sgd_single_epoch(training_data, mini_batch_size, eta)
@@ -74,7 +68,6 @@ class Network(object):
 
     def sgd_single_epoch(self, training_data, mini_batch_size, eta):
         """Train the neural network using mini-batch stochastic gradient descent."""
-        training_data = list(training_data)
         random.shuffle(training_data)
 
         mini_batches = [
@@ -152,6 +145,14 @@ class Network(object):
             nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
 
         return (nabla_b, nabla_w)
+
+    def evaluate(self, test_data):
+        """Return the number of test inputs for which the neural
+        network outputs the correct result. Note that the neural
+        network's output is assumed to be the index of whichever
+        neuron in the final layer has the highest activation."""
+        test_results = [(np.argmax(self.feedforward(x)), y) for (x, y) in test_data]
+        return sum(int(x == y) for (x, y) in test_results)
 
 
 def sigmoid(z):
